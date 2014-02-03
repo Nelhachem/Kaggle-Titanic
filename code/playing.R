@@ -36,6 +36,7 @@ sampled.train <- sampled.train[,-1]
 validation.labels <- sampled.validation[,1]
 sampled.validation <- sampled.validation[,-1]
 
+library(FNN)
 system.time(results <- (0:9)[knn(sampled.train, sampled.validation, labels, k = 10, algorithm="cover_tree")])
 
 error.rate <- length(which(results != validation.labels))/nrow(sampled.validation)
@@ -54,3 +55,20 @@ error.rates <- foreach(num.of.neigbors=1:20, .export=c("knn")) %dopar% {
 Sys.time()
 stopCluster(cl)
 # the above experiment took about 26 minutes with parallel computing
+
+Sys.time()
+error.rates <- vector(length=20)
+for(num.of.neigbors in c(1:20)){
+  results <- (0:9)[knn(sampled.train, sampled.validation, labels, k = num.of.neigbors, algorithm="cover_tree")]
+  error.rates[num.of.neigbors] <- length(which(results != validation.labels))/nrow(sampled.validation)
+}
+Sys.time()
+# and this took 51 minutes
+
+Sys.time()
+error.rates <- sapply(X=c(1:20), FUN=function(num){
+  results <- (0:9)[knn(sampled.train, sampled.validation, labels, k = num, algorithm="cover_tree")]
+  length(which(results != validation.labels))/nrow(sampled.validation)
+})
+Sys.time()
+# and this took about 52 minutes
