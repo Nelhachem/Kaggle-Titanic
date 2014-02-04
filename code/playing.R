@@ -47,6 +47,9 @@ require(doParallel)
 cl <- makeCluster(2)
 registerDoParallel(cl)
 
+# change the data frame into matrix (not faster, actually a bit slow)
+sampled.train <- as.matrix(sampled.train)
+sampled.validation <- as.matrix(sampled.validation)
 Sys.time()
 error.rates <- foreach(num.of.neigbors=1:20, .export=c("knn")) %dopar% {
   results <- (0:9)[knn(sampled.train, sampled.validation, labels, k = num.of.neigbors, algorithm="cover_tree")]
@@ -54,7 +57,7 @@ error.rates <- foreach(num.of.neigbors=1:20, .export=c("knn")) %dopar% {
 }
 Sys.time()
 stopCluster(cl)
-# the above experiment took about 26 minutes with parallel computing
+# the above experiment took about 26 minutes with parallel computing (half time saved!)
 
 Sys.time()
 error.rates <- vector(length=20)
