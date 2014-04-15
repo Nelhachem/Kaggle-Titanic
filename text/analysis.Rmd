@@ -1,0 +1,148 @@
+Titanic Kaggle
+========================================================
+
+Load both the train and test data
+--------------------------------------
+
+```{r, cache=TRUE}
+rm(list=ls())
+train <- read.csv(file="../data/raw//train.csv", header=T, sep=",")
+test <- read.csv(file="../data/raw//test.csv", header=T, sep=",")
+```
+
+Initial Analysis
+---------------------------
+```{r}
+summary(train)
+summary(test)
+```
+A few things worth noting based on the summary:
+
+* The Survived variable should be a factor variable with two levels, but we can always use it as a factor using the "as.factor()" method.
+
+* There are a few missing values in Age in both sets. We can fill them with different methods but whatever methods we use must only be based on the train data. The same works for the Fare variable.
+
+* Embarked variable has two missing values in the train data. Since this is a very small portion, we can first fill them with the value "S" (the largest level).
+
+* PClass should probably be a factor variable but there is possibly a ranking in the variable (first class, middle class, and third class). So in order to keep this info, we leave it as is (although this may not precisely represent the difference between two classes). We can think about ordinal encoding but the algorithms we are using in R may not accept ordinal variables.
+
+* We should probably not include PassengerId, Ticket and Cabin in the modeling. But we can always check them later.
+
+* Usually I would treat the Name variable the same as the three variables above. But according to the tutorial on Kaggle, the text in the Name may actually provide something useful. So We can keep it now.
+
+Preprocessing
+--------------------------
+### Filling the missing values
+There are a few different ways for filling missing values. We will start with the simplest one -- fill all missing value with the median value in the train data.
+
+```{r, cache=TRUE}
+train.processed <- train
+test.processed <- test
+
+# filling the missing value in the Age variable
+train.processed$Age[is.na(train.processed$Age)] <- median(train.processed$Age, na.rm=T)
+test.processed$Age[is.na(test.processed$Age)] <- median(train.processed$Age, na.rm=T)
+
+# filling the missing value in the Fare variable in test data
+test.processed$Fare[is.na(test.processed$Fare)] <- median(train.processed$Fare, 
+                                                        na.rm=T)
+
+# fix the missing values in the Embarked variable
+# this may be a bit tricky. In order to keep the same level order in the variable
+# we have to merge the train and test data together first
+test.processed$Survived <- NA
+combined <- rbind(train.processed, test.processed)
+combined$Embarked[combined$Embarked == ""] <- "S"
+combined$Embarked <- factor(combined$Embarked)
+
+# split back to train and test data
+train.processed <- combined[1:891,]
+test.processed <- combined[-c(1:891),]
+
+save(train.processed, file="../data/processed/train.processed.v1.RData")
+save(test.processed, file="../data/processed/test.processed.v1.RData")
+```
+
+After this simple preprocessing, let's take a look the summary.
+```{r}
+summary(train.processed)
+summary(test.processed)
+```
+There are no more missing values except for the Survived variable in the test, which is the target we are going to predict.
+
+Prediction
+-----------------------------
+### Random Forest
+If you haven't install the randomForest package, install it first.
+```{r}
+# install.packages("randomForest")
+require(randomForest)
+set.seed(101)
+
+fit <- randomForest(as.factor(Survived) ~ . - PassengerId - Name - Ticket - Cabin,
+                    data = train.processed, ntree=2000, importance=T)
+```
+Let's take a look at the variable importance.
+```{r fig.height=4, fig.width=5}
+varImpPlot(fit)
+```
+It seems that the variable Sex is dominating. This may not be good but let's see the prediction of this model first.
+```{r, cache=TRUE}
+test.processed$Survived <- NULL
+Prediction <- predict(fit, test.processed)
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v1.csv", row.names = FALSE)
+```
+Now this submission on April 12th, 2014 achieved 77.512% accuracy, ranking 803rd/1264. Good job submitting the first result. We have a lot space for improvement. Keep going!
+
+Analysis on April 13, 2014
+--------------------------------
+Yesterday we used the variable median to fill the missing values in the data. What if we use another way to do that instead?
+
+We use the same method in the tutorial--the rpart with anova method.
+```{r, cache=TRUE}
+# we set the value of original empty cells in Age back to NA
+train.processed$Age[is.na(train$Age)] <- NA
+test.processed$Age[is.na(test$Age)] <- NA
+
+# install.package("rpart")
+require(rpart)
+Agefit <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked, data=train.processed[!is.na(train.processed$Age),], method="anova")
+
+train.processed$Age[is.na(train.processed$Age)] <- predict(Agefit, train.processed[is.na(train.processed$Age),])
+test.processed$Age[is.na(test.processed$Age)] <- predict(Agefit, test.processed[is.na(test.processed$Age),])
+
+save(train.processed, file="../data/processed/train.processed.v2.RData")
+save(test.processed, file="../data/processed/test.processed.v2.RData")
+```
+Prediction
+-----------------------------
+### Random Forest
+If you haven't install the randomForest package, install it first.
+```{r,cache=TRUE}
+# install.packages("randomForest")
+require(randomForest)
+set.seed(101)
+
+fit <- randomForest(as.factor(Survived) ~ . - PassengerId - Name - Ticket - Cabin,
+                    data = train.processed, ntree=2000, importance=T)
+```
+Let's take a look at the variable importance.
+```{r fig.height=4, fig.width=5}
+varImpPlot(fit)
+```
+It seems that the variable Sex is dominating. This may not be good but let's see the prediction of this model first.
+```{r, cache=TRUE}
+test.processed$Survived <- NULL
+Prediction <- predict(fit, test.processed)
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v2.csv", row.names = FALSE)
+```
+Now this submission on April 13th, 2014 achieved 77.990% accuracy, ranking 741st/1258. Good job submitting the first result. We have a lot space for improvement. Keep going!
+
+Next Step
+-------------------------
+Instead of adding more features like what the tutorial does, go back and try out what we have learned in the courses: 
+* Learning Curves
+* Start with simple algorithms like logistic regression
+* Based on the learning curve, think about ways for improvement like adding more variables, polynomial terms, or less variables.

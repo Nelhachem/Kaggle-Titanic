@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>Titanic Kaggle</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: rgb(88, 72, 246)
+   }
+
+   pre .number {
+     color: rgb(0, 0, 205);
+   }
+
+   pre .comment {
+     color: rgb(76, 136, 107);
+   }
+
+   pre .keyword {
+     color: rgb(0, 0, 255);
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: rgb(3, 106, 7);
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+
+</head>
+
+<body>
+<h1>Titanic Kaggle</h1>
+
+<h2>Load both the train and test data</h2>
+
+<pre><code class="r">rm(list = ls())
+train &lt;- read.csv(file = &quot;../data/raw//train.csv&quot;, header = T, sep = &quot;,&quot;)
+test &lt;- read.csv(file = &quot;../data/raw//test.csv&quot;, header = T, sep = &quot;,&quot;)
+</code></pre>
+
+<h2>Initial Analysis</h2>
+
+<pre><code class="r">summary(train)
+</code></pre>
+
+<pre><code>##   PassengerId     Survived         Pclass    
+##  Min.   :  1   Min.   :0.000   Min.   :1.00  
+##  1st Qu.:224   1st Qu.:0.000   1st Qu.:2.00  
+##  Median :446   Median :0.000   Median :3.00  
+##  Mean   :446   Mean   :0.384   Mean   :2.31  
+##  3rd Qu.:668   3rd Qu.:1.000   3rd Qu.:3.00  
+##  Max.   :891   Max.   :1.000   Max.   :3.00  
+##                                              
+##                                     Name         Sex           Age       
+##  Abbing, Mr. Anthony                  :  1   female:314   Min.   : 0.42  
+##  Abbott, Mr. Rossmore Edward          :  1   male  :577   1st Qu.:20.12  
+##  Abbott, Mrs. Stanton (Rosa Hunt)     :  1                Median :28.00  
+##  Abelson, Mr. Samuel                  :  1                Mean   :29.70  
+##  Abelson, Mrs. Samuel (Hannah Wizosky):  1                3rd Qu.:38.00  
+##  Adahl, Mr. Mauritz Nils Martin       :  1                Max.   :80.00  
+##  (Other)                              :885                NA&#39;s   :177    
+##      SibSp           Parch            Ticket         Fare      
+##  Min.   :0.000   Min.   :0.000   1601    :  7   Min.   :  0.0  
+##  1st Qu.:0.000   1st Qu.:0.000   347082  :  7   1st Qu.:  7.9  
+##  Median :0.000   Median :0.000   CA. 2343:  7   Median : 14.5  
+##  Mean   :0.523   Mean   :0.382   3101295 :  6   Mean   : 32.2  
+##  3rd Qu.:1.000   3rd Qu.:0.000   347088  :  6   3rd Qu.: 31.0  
+##  Max.   :8.000   Max.   :6.000   CA 2144 :  6   Max.   :512.3  
+##                                  (Other) :852                  
+##          Cabin     Embarked
+##             :687    :  2   
+##  B96 B98    :  4   C:168   
+##  C23 C25 C27:  4   Q: 77   
+##  G6         :  4   S:644   
+##  C22 C26    :  3           
+##  D          :  3           
+##  (Other)    :186
+</code></pre>
+
+<pre><code class="r">summary(test)
+</code></pre>
+
+<pre><code>##   PassengerId       Pclass    
+##  Min.   : 892   Min.   :1.00  
+##  1st Qu.: 996   1st Qu.:1.00  
+##  Median :1100   Median :3.00  
+##  Mean   :1100   Mean   :2.27  
+##  3rd Qu.:1205   3rd Qu.:3.00  
+##  Max.   :1309   Max.   :3.00  
+##                               
+##                                         Name         Sex     
+##  Abbott, Master. Eugene Joseph            :  1   female:152  
+##  Abelseth, Miss. Karen Marie              :  1   male  :266  
+##  Abelseth, Mr. Olaus Jorgensen            :  1               
+##  Abrahamsson, Mr. Abraham August Johannes :  1               
+##  Abrahim, Mrs. Joseph (Sophie Halaut Easu):  1               
+##  Aks, Master. Philip Frank                :  1               
+##  (Other)                                  :412               
+##       Age            SibSp           Parch            Ticket   
+##  Min.   : 0.17   Min.   :0.000   Min.   :0.000   PC 17608:  5  
+##  1st Qu.:21.00   1st Qu.:0.000   1st Qu.:0.000   113503  :  4  
+##  Median :27.00   Median :0.000   Median :0.000   CA. 2343:  4  
+##  Mean   :30.27   Mean   :0.447   Mean   :0.392   16966   :  3  
+##  3rd Qu.:39.00   3rd Qu.:1.000   3rd Qu.:0.000   220845  :  3  
+##  Max.   :76.00   Max.   :8.000   Max.   :9.000   347077  :  3  
+##  NA&#39;s   :86                                      (Other) :396  
+##       Fare                   Cabin     Embarked
+##  Min.   :  0.0                  :327   C:102   
+##  1st Qu.:  7.9   B57 B59 B63 B66:  3   Q: 46   
+##  Median : 14.5   A34            :  2   S:270   
+##  Mean   : 35.6   B45            :  2           
+##  3rd Qu.: 31.5   C101           :  2           
+##  Max.   :512.3   C116           :  2           
+##  NA&#39;s   :1       (Other)        : 80
+</code></pre>
+
+<p>A few things worth noting based on the summary:</p>
+
+<ul>
+<li><p>The Survived variable should be a factor variable with two levels, but we can always use it as a factor using the &ldquo;as.factor()&rdquo; method.</p></li>
+<li><p>There are a few missing values in Age in both sets. We can fill them with different methods but whatever methods we use must only be based on the train data. The same works for the Fare variable.</p></li>
+<li><p>Embarked variable has two missing values in the train data. Since this is a very small portion, we can first fill them with the value &ldquo;S&rdquo; (the largest level).</p></li>
+<li><p>PClass should probably be a factor variable but there is possibly a ranking in the variable (first class, middle class, and third class). So in order to keep this info, we leave it as is (although this may not precisely represent the difference between two classes). We can think about ordinal encoding but the algorithms we are using in R may not accept ordinal variables.</p></li>
+<li><p>We should probably not include PassengerId, Ticket and Cabin in the modeling. But we can always check them later.</p></li>
+<li><p>Usually I would treat the Name variable the same as the three variables above. But according to the tutorial on Kaggle, the text in the Name may actually provide something useful. So We can keep it now.</p></li>
+</ul>
+
+<h2>Preprocessing</h2>
+
+<h3>Filling the missing values</h3>
+
+<p>There are a few different ways for filling missing values. We will start with the simplest one &ndash; fill all missing value with the median value in the train data.</p>
+
+<pre><code class="r">train.processed &lt;- train
+test.processed &lt;- test
+
+# filling the missing value in the Age variable
+train.processed$Age[is.na(train.processed$Age)] &lt;- median(train.processed$Age, 
+    na.rm = T)
+test.processed$Age[is.na(test.processed$Age)] &lt;- median(train.processed$Age, 
+    na.rm = T)
+
+# filling the missing value in the Fare variable in test data
+test.processed$Fare[is.na(test.processed$Fare)] &lt;- median(train.processed$Fare, 
+    na.rm = T)
+
+# fix the missing values in the Embarked variable this may be a bit tricky.
+# In order to keep the same level order in the variable we have to merge the
+# train and test data together first
+test.processed$Survived &lt;- NA
+combined &lt;- rbind(train.processed, test.processed)
+combined$Embarked[combined$Embarked == &quot;&quot;] &lt;- &quot;S&quot;
+combined$Embarked &lt;- factor(combined$Embarked)
+
+# split back to train and test data
+train.processed &lt;- combined[1:891, ]
+test.processed &lt;- combined[-c(1:891), ]
+
+save(train.processed, file = &quot;../data/processed/train.processed.v1.RData&quot;)
+save(test.processed, file = &quot;../data/processed/test.processed.v1.RData&quot;)
+</code></pre>
+
+<p>After this simple preprocessing, let&#39;s take a look the summary.</p>
+
+<pre><code class="r">summary(train.processed)
+</code></pre>
+
+<pre><code>##   PassengerId     Survived         Pclass    
+##  Min.   :  1   Min.   :0.000   Min.   :1.00  
+##  1st Qu.:224   1st Qu.:0.000   1st Qu.:2.00  
+##  Median :446   Median :0.000   Median :3.00  
+##  Mean   :446   Mean   :0.384   Mean   :2.31  
+##  3rd Qu.:668   3rd Qu.:1.000   3rd Qu.:3.00  
+##  Max.   :891   Max.   :1.000   Max.   :3.00  
+##                                              
+##                                     Name         Sex           Age       
+##  Abbing, Mr. Anthony                  :  1   female:314   Min.   : 0.42  
+##  Abbott, Mr. Rossmore Edward          :  1   male  :577   1st Qu.:22.00  
+##  Abbott, Mrs. Stanton (Rosa Hunt)     :  1                Median :28.00  
+##  Abelson, Mr. Samuel                  :  1                Mean   :29.36  
+##  Abelson, Mrs. Samuel (Hannah Wizosky):  1                3rd Qu.:35.00  
+##  Adahl, Mr. Mauritz Nils Martin       :  1                Max.   :80.00  
+##  (Other)                              :885                               
+##      SibSp           Parch            Ticket         Fare      
+##  Min.   :0.000   Min.   :0.000   1601    :  7   Min.   :  0.0  
+##  1st Qu.:0.000   1st Qu.:0.000   347082  :  7   1st Qu.:  7.9  
+##  Median :0.000   Median :0.000   CA. 2343:  7   Median : 14.5  
+##  Mean   :0.523   Mean   :0.382   3101295 :  6   Mean   : 32.2  
+##  3rd Qu.:1.000   3rd Qu.:0.000   347088  :  6   3rd Qu.: 31.0  
+##  Max.   :8.000   Max.   :6.000   CA 2144 :  6   Max.   :512.3  
+##                                  (Other) :852                  
+##          Cabin     Embarked
+##             :687   C:168   
+##  B96 B98    :  4   Q: 77   
+##  C23 C25 C27:  4   S:646   
+##  G6         :  4           
+##  C22 C26    :  3           
+##  D          :  3           
+##  (Other)    :186
+</code></pre>
+
+<pre><code class="r">summary(test.processed)
+</code></pre>
+
+<pre><code>##   PassengerId      Survived       Pclass    
+##  Min.   : 892   Min.   : NA   Min.   :1.00  
+##  1st Qu.: 996   1st Qu.: NA   1st Qu.:1.00  
+##  Median :1100   Median : NA   Median :3.00  
+##  Mean   :1100   Mean   :NaN   Mean   :2.27  
+##  3rd Qu.:1205   3rd Qu.: NA   3rd Qu.:3.00  
+##  Max.   :1309   Max.   : NA   Max.   :3.00  
+##                 NA&#39;s   :418                 
+##                                        Name         Sex     
+##  Connolly, Miss. Kate                    :  1   female:152  
+##  Kelly, Mr. James                        :  1   male  :266  
+##  Abbott, Master. Eugene Joseph           :  1               
+##  Abelseth, Miss. Karen Marie             :  1               
+##  Abelseth, Mr. Olaus Jorgensen           :  1               
+##  Abrahamsson, Mr. Abraham August Johannes:  1               
+##  (Other)                                 :412               
+##       Age            SibSp           Parch            Ticket   
+##  Min.   : 0.17   Min.   :0.000   Min.   :0.000   PC 17608:  5  
+##  1st Qu.:23.00   1st Qu.:0.000   1st Qu.:0.000   113503  :  4  
+##  Median :28.00   Median :0.000   Median :0.000   CA. 2343:  4  
+##  Mean   :29.81   Mean   :0.447   Mean   :0.392   16966   :  3  
+##  3rd Qu.:35.75   3rd Qu.:1.000   3rd Qu.:0.000   220845  :  3  
+##  Max.   :76.00   Max.   :8.000   Max.   :9.000   347077  :  3  
+##                                                  (Other) :396  
+##       Fare                   Cabin     Embarked
+##  Min.   :  0.0                  :327   C:102   
+##  1st Qu.:  7.9   B57 B59 B63 B66:  3   Q: 46   
+##  Median : 14.5   A34            :  2   S:270   
+##  Mean   : 35.6   C101           :  2           
+##  3rd Qu.: 31.5   C23 C25 C27    :  2           
+##  Max.   :512.3   C78            :  2           
+##                  (Other)        : 80
+</code></pre>
+
+<p>There are no more missing values except for the Survived variable in the test, which is the target we are going to predict.</p>
+
+<h2>Prediction</h2>
+
+<h3>Random Forest</h3>
+
+<p>If you haven&#39;t install the randomForest package, install it first.</p>
+
+<pre><code class="r"># install.packages(&#39;randomForest&#39;)
+require(randomForest)
+</code></pre>
+
+<pre><code>## Loading required package: randomForest
+</code></pre>
+
+<pre><code>## Warning: package &#39;randomForest&#39; was built under R version 3.0.3
+</code></pre>
+
+<pre><code>## randomForest 4.6-7
+## Type rfNews() to see new features/changes/bug fixes.
+</code></pre>
+
+<pre><code class="r">set.seed(101)
+
+fit &lt;- randomForest(as.factor(Survived) ~ . - PassengerId - Name - Ticket - 
+    Cabin, data = train.processed, ntree = 2000, importance = T)
+</code></pre>
+
+<p>Let&#39;s take a look at the variable importance.</p>
+
+<pre><code class="r">varImpPlot(fit)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAEgCAMAAACuMBnmAAAAtFBMVEX9/v0AAAAAADkAAGUAOWUAOY8AZo8AZrU5AAA5ADk5AGU5OQA5OWU5OY85Zo85ZrU5j485j9plAABlADllAGVlOQBlOTllOY9lZgBlZjllZmVlZrVltf2POQCPOTmPOWWPZgCPZo+PjzmPj2WPtY+P27WP29qP2/21ZgC1Zjm1tWW124+1/rW1/tq1/v2+vr7ajznaj2Xa24/a29ra/rXa/tra/v39tWX924/9/rX9/tr9/v2qlB91AAAAPHRSTlP//////////////////////////////////////////////////////////////////////////////wC7iOunAAAACXBIWXMAAAsSAAALEgHS3X78AAAL1UlEQVR4nO2dDXvbthWFS7uenKzeIsdpVldSunWt1CZx1W4VZfL//6/yAuCXLBIACRyK7TnPo8gSycPLNyBE4hLAFzkF0RdTB/BXEUGDRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDNFPQ/5s6AG/NDHSaJG/ebrP1cupAvDUz0LuF/EvQsbVLkutPb39cJ8li6lB8NS/QUqKfWXUARNAgETRIBA0SQYNE0CBp0Pmel3dUhwgaJIIGiaBBImiQCBokggaJoEEiaJAIGiSCBomgQSJokAgaJIIGiaBBImiQCBokggaJoEEiaJAIGiSCBomgQSJokAgaJIIGiaBBImiQCBokggaJoEEiaJAIGiSCBomgQSJokAgaJIIGiaBBImiQCBokggaJoEEiaJAIGiSCBomgQSJokAgaJIIGiaBBImiQCBokggaJoEEiaJAIGiSCBomgQQoKOommkFFOE3NY0CHNIMa4mAkaZEzQIGOCBhkTNMiYoEHGBA0yJmiQMUGDjAkaZEzQIGOCBhkTNMiYoEHGp6Cf75Pk+imMdzj1G88i5hPQz/erPN/fHIJ4h5G07PYazyPmE9DH10XJkPnVilJSFJLdMt97zLMWI2jx7G/4n0fMJ6CztSkZOtznh08PHudk8kue/xL4JZ79oOcR84sfwzRJrra6gBTx7hOfKRqnKdHziPncVcfx1VZ+XyT44k/PHQSXtY5WuviYT0CnqnbbrZ7N2bd79JkKc5qrjnnEfO6qQ87Bor5L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" alt="plot of chunk unnamed-chunk-6"/> </p>
+
+<p>It seems that the variable Sex is dominating. This may not be good but let&#39;s see the prediction of this model first.</p>
+
+<pre><code class="r">test.processed$Survived &lt;- NULL
+Prediction &lt;- predict(fit, test.processed)
+submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = &quot;../results/res.randomforest.v1.csv&quot;, row.names = FALSE)
+</code></pre>
+
+<p>Now this submission on April 12th, 2014 achieved 77.512% accuracy, ranking 803rd/1264. Good job submitting the first result. We have a lot space for improvement. Keep going!</p>
+
+<h2>Analysis on April 13, 2014</h2>
+
+<p>Yesterday we used the variable median to fill the missing values in the data. What if we use another way to do that instead?</p>
+
+<p>We use the same method in the tutorial&ndash;the rpart with anova method.</p>
+
+<pre><code class="r"># we set the value of original empty cells in Age back to NA
+train.processed$Age[is.na(train$Age)] &lt;- NA
+test.processed$Age[is.na(test$Age)] &lt;- NA
+
+# install.package(&#39;rpart&#39;)
+require(rpart)
+</code></pre>
+
+<pre><code>## Loading required package: rpart
+</code></pre>
+
+<pre><code>## Warning: package &#39;rpart&#39; was built under R version 3.0.3
+</code></pre>
+
+<pre><code class="r">Agefit &lt;- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked, data = train.processed[!is.na(train.processed$Age), 
+    ], method = &quot;anova&quot;)
+
+train.processed$Age[is.na(train.processed$Age)] &lt;- predict(Agefit, train.processed[is.na(train.processed$Age), 
+    ])
+test.processed$Age[is.na(test.processed$Age)] &lt;- predict(Agefit, test.processed[is.na(test.processed$Age), 
+    ])
+
+save(train.processed, file = &quot;../data/processed/train.processed.v2.RData&quot;)
+save(test.processed, file = &quot;../data/processed/test.processed.v2.RData&quot;)
+</code></pre>
+
+<h2>Prediction</h2>
+
+<h3>Random Forest</h3>
+
+<p>If you haven&#39;t install the randomForest package, install it first.</p>
+
+<pre><code class="r"># install.packages(&#39;randomForest&#39;)
+require(randomForest)
+set.seed(101)
+
+fit &lt;- randomForest(as.factor(Survived) ~ . - PassengerId - Name - Ticket - 
+    Cabin, data = train.processed, ntree = 2000, importance = T)
+</code></pre>
+
+<p>Let&#39;s take a look at the variable importance.</p>
+
+<pre><code class="r">varImpPlot(fit)
+</code></pre>
+
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAEgCAMAAACuMBnmAAAAtFBMVEX9/v0AAAAAADkAAGUAOWUAOY8AZo8AZrU5AAA5ADk5AGU5OQA5OWU5OY85Zo85ZrU5j485j9plAABlADllAGVlOQBlOTllOY9lZgBlZjllZmVlZrVltf2POQCPOTmPOWWPZgCPZo+PjzmPj2WPtY+P27WP29qP2/21ZgC1Zjm1tWW124+1/rW1/tq1/v2+vr7ajznaj2Xa24/a29ra/rXa/tra/v39tWX924/9/rX9/tr9/v2qlB91AAAAPHRSTlP//////////////////////////////////////////////////////////////////////////////wC7iOunAAAACXBIWXMAAAsSAAALEgHS3X78AAAL70lEQVR4nO2dDZubNhaFS6aznmQ7u/Fk0mxnsdPdbmu3SRzvR20P/P//tVxJfI4BCaQDPD3nqeOxgcPlrZBB4krfpBRE30wdwB9FBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDRNAgETRIBA3SQkH/d+oAnLUw0Ocoevtul2zWUwfirIWB3q/kX4IOrX0U3Xx+98smilZTh+KqZYGWEv3MqgMgggaJoEEiaJAIGiSCBkmDTo+8vKNaRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNEkGDRNAgETRIBA0SQYNE0CARNEgEDRJBg0TQIBE0SAQNklfQUTD5jHKamP2C9mkGMcbFTNAgY4IGGRM0yJigQcYEDTImaJAxQYOMCRpkTNAgY4IGGRM0yJigQcYEDTJugn5+iKKbgx9vf+o2XkTMDdDPD3GaHm9PXrz9SFp2O42XEXMD9OVNVjJkfrWslGSFZL9Ojw7zrIUIWjy7G/6XEXMDdLIxJUOH+/z4+dHhnIy+pulXzy/x7Aa9jJhf/Bieo+jVTheQLN5j5DJF4zQlehkxX7vquLzeye+LBJ/96bgD7+qto5VmH3MD9FnVbvv42Zx9+yeXqTCnuepYRszXrjrkHMzqu/Pt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" alt="plot of chunk unnamed-chunk-10"/> </p>
+
+<p>It seems that the variable Sex is dominating. This may not be good but let&#39;s see the prediction of this model first.</p>
+
+<pre><code class="r">test.processed$Survived &lt;- NULL
+Prediction &lt;- predict(fit, test.processed)
+submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = &quot;../results/res.randomforest.v2.csv&quot;, row.names = FALSE)
+</code></pre>
+
+<p>Now this submission on April 13th, 2014 achieved 77.990% accuracy, ranking 741st/1258. Good job submitting the first result. We have a lot space for improvement. Keep going!</p>
+
+<h2>Next Step</h2>
+
+<p>Instead of adding more features like what the tutorial does, go back and try out what we have learned in the courses: </p>
+
+<ul>
+<li>Learning Curves</li>
+<li>Start with simple algorithms like logistic regression</li>
+<li>Based on the learning curve, think about ways for improvement like adding more variables, polynomial terms, or less variables.</li>
+</ul>
+
+</body>
+
+</html>
+
