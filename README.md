@@ -1,4 +1,4 @@
-Kaggle-Digit-Recognizer
+Kaggle-Titanic
 =======================
 
-Kaggle Tutorial
+Kaggle Titanic
