@@ -27,6 +27,13 @@ for(i in c(1:length(num.of.train.samples))){
   }
 }
 
+errors <- data.frame(sample.size=num.of.train.samples,
+                     train=rowMeans(train.matrix),
+                     val=rowMeans(val.matrix))
+
+require(ggplot2)
+p <- ggplot(data=errors) 
+p + geom_line(aes(x=sample.size, y=train,colour="#000099")) + geom_point(aes(x=sample.size, y=val))
 # ================= dirty test of the model ===============
 glm.fit <- glm(Survived ~ ., family = binomial, data = train.processed)
 load("data//processed//test.processed.v1.RData")
