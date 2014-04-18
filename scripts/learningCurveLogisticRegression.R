@@ -20,20 +20,31 @@ cost <- function(labels,pred){
   mean(labels!=ifelse(pred > 0.5, 1, 0))
 }
 
-for(i in c(1:length(num.of.train.samples))){
-  for(j in c(1:20)){
-    selected <- sample(c(1:nrow(train.processed)), num.of.train.samples[i])
-    fit <- glm(Survived ~ ., family = binomial, data = train.processed[selected,])
-    trainRes <- ifelse(predict(fit, type="response")>0.5, "1", "0")
-    train.matrix[i, j] <- mean(trainRes != train.processed[selected,]$Survived)
-    cv.err <- cv.glm(train.processed[selected,], fit, cost, 10)
-    val.matrix[i, j] <- cv.err$delta[1]
-  }
-}
+require(doParallel)
+cl <- makeCluster(2)
+registerDoParallel(cl)
 
-errors <- data.frame(sample.size=num.of.train.samples,
-                     train=rowMeans(train.matrix),
-                     val=rowMeans(val.matrix))
+print(date())
+ptime <- system.time({
+  r <- foreach(i=c(1:length(num.of.train.samples)), .export=c("glm","cv.glm")) %dopar% {
+    res <- lapply(c(1:20), function(x, i){
+      selected <- sample(c(1:nrow(train.processed)), num.of.train.samples[i])
+      fit <- glm(Survived ~ ., family = binomial, data = train.processed[selected,])
+      trainRes <- ifelse(predict(fit, type="response")>0.5, "1", "0")
+      train.error <- mean(trainRes != train.processed[selected,]$Survived)
+      cv.err <- cv.glm(train.processed[selected,], fit, cost, 10)$delta[1]
+      c(train.error, cv.err)
+    }, i)
+    temp <- matrix(unlist(res), ncol=2, byrow=T)
+    iErr <- apply(temp, 2, mean)
+  }
+})
+stopCluster(cl)
+print(date())
+
+r <- matrix(unlist(r), ncol=2, byrow=T)
+
+errors <- data.frame(sample.size=num.of.train.samples, train=r[,1], val=r[,2])
 
 require(ggplot2)
 p <- ggplot(data=errors) 
