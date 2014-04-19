@@ -494,15 +494,85 @@ write.csv(submit, file = &quot;../results/res.randomforest.v2.csv&quot;, row.nam
 
 <p>Now this submission on April 13th, 2014 achieved 77.990% accuracy, ranking 741st/1258. Good job submitting the first result. We have a lot space for improvement. Keep going!</p>
 
-<h2>Next Step</h2>
+<h1>Analysis on April 19, 2014</h1>
 
-<p>Instead of adding more features like what the tutorial does, go back and try out what we have learned in the courses: </p>
+<p>(Mentioning about Learning Curve in Andrew Ng&#39;s class here) According to the learning curve analysis on Logistic Regression (this will be inserted here), we are likely to be underfitting the data. Therefore, getting more data is not going to help much. However, we can add additional features or polynomial terms to help. </p>
 
-<ul>
-<li>Learning Curves</li>
-<li>Start with simple algorithms like logistic regression</li>
-<li>Based on the learning curve, think about ways for improvement like adding more variables, polynomial terms, or less variables.</li>
-</ul>
+<p>So what additional features can we add here? Remember that at the beginning, we removed several features including PassengerId, Cabin, Ticket and Name. As mentioned in the tutorial, the first three features are almost unique to each passenger. But what about the Name? Maybe we can extract something useful from those text strings. The tutorial mentioned the Titles of each passenger, which represents their social class and influences how they behaved. So let&#39;s extract the title as the tutorial does.</p>
+
+<pre><code class="r">test.processed$Survived &lt;- NA
+combi &lt;- rbind(train.processed, test.processed)
+combi$Name &lt;- as.character(combi$Name)
+combi$Title &lt;- sapply(combi$Name, FUN = function(x) {
+    strsplit(x, split = &quot;[,.]&quot;)[[1]][2]
+})
+combi$Title &lt;- sub(&quot; &quot;, &quot;&quot;, combi$Title)
+</code></pre>
+
+<p>OK, let&#39;s take a look at it.</p>
+
+<pre><code class="r">table(combi$Title)
+</code></pre>
+
+<pre><code>## 
+##         Capt          Col          Don         Dona           Dr 
+##            1            4            1            1            8 
+##     Jonkheer         Lady        Major       Master         Miss 
+##            1            1            2           61          260 
+##         Mlle          Mme           Mr          Mrs           Ms 
+##            2            1          757          197            2 
+##          Rev          Sir the Countess 
+##            8            1            1
+</code></pre>
+
+<p>It appears that there are some rare titles and we need to merge them together.</p>
+
+<pre><code class="r">combi$Title[combi$Title %in% c(&quot;Mme&quot;, &quot;Mlle&quot;)] &lt;- &quot;Mlle&quot;
+combi$Title[combi$Title %in% c(&quot;Capt&quot;, &quot;Don&quot;, &quot;Major&quot;, &quot;Sir&quot;)] &lt;- &quot;Sir&quot;
+combi$Title[combi$Title %in% c(&quot;Dona&quot;, &quot;Lady&quot;, &quot;the Countess&quot;, &quot;Jonkheer&quot;)] &lt;- &quot;Lady&quot;
+combi$Title &lt;- factor(combi$Title)
+</code></pre>
+
+<p>The tutorial also added other features including FamilySize and FamilyID. We add them here as well.</p>
+
+<pre><code class="r">combi$FamilySize &lt;- combi$SibSp + combi$Parch + 1
+combi$Surname &lt;- sapply(combi$Name, FUN = function(x) {
+    strsplit(x, split = &quot;[,.]&quot;)[[1]][1]
+})
+combi$FamilyID &lt;- paste(as.character(combi$FamilySize), combi$Surname, sep = &quot;&quot;)
+famIDs &lt;- data.frame(table(combi$FamilyID))
+famIDs &lt;- famIDs[famIDs$Freq &lt;= 2, ]
+combi$FamilyID[combi$FamilyID %in% famIDs$Var1] &lt;- &quot;Small&quot;
+combi$FamilyID &lt;- factor(combi$FamilyID)
+
+combi$Survived &lt;- as.factor(combi$Survived)
+train.processed &lt;- combi[1:891, ]
+test.processed &lt;- combi[892:1309, ]
+save(train.processed, file = &quot;../data/processed/train.processed.v3.RData&quot;)
+save(test.processed, file = &quot;../data/processed/test.processed.v3.RData&quot;)
+</code></pre>
+
+<h2>Prediction</h2>
+
+<pre><code class="r">fit &lt;- glm(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + 
+    Title + FamilySize, family = binomial, data = train.processed)
+</code></pre>
+
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+</code></pre>
+
+<pre><code class="r">
+test.processed$Survived &lt;- NULL
+Prediction &lt;- ifelse(predict(fit, newdata = test.processed, type = &quot;response&quot;) &gt; 
+    0.5, &quot;1&quot;, &quot;0&quot;)
+</code></pre>
+
+<pre><code>## Warning: prediction from a rank-deficient fit may be misleading
+</code></pre>
+
+<pre><code class="r">submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = &quot;../results/res.randomforest.v3.csv&quot;, row.names = FALSE)
+</code></pre>
 
 </body>
 

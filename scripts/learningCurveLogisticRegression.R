@@ -13,8 +13,6 @@ rows <- nrow(train.processed)
 
 # ================= build the learning curves =============
 num.of.train.samples <- seq(from=100, to=nrow(train.processed), by=5)
-train.matrix <- matrix(0,nrow=length(num.of.train.samples), ncol=20)
-val.matrix <- matrix(0,nrow=length(num.of.train.samples), ncol=20)
 
 cost <- function(labels,pred){
   mean(labels!=ifelse(pred > 0.5, 1, 0))

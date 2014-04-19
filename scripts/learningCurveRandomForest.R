@@ -11,25 +11,37 @@ val.set <- sample(c(1:rows), floor(0.4*rows))
 validation <- train.processed[val.set,]
 train <- train.processed[-val.set,]
 
-# ================= build the learning curves =============
-require(randomForest)
-num.of.train.samples <- seq(from=50, to=nrow(train), by=5)
-train.matrix <- matrix(0,nrow=length(num.of.train.samples), ncol=20)
-val.matrix <- matrix(0,nrow=length(num.of.train.samples), ncol=20)
-for(i in c(1:length(num.of.train.samples))){
-  for(j in c(1:20)){
-    selected <- sample(c(1:nrow(train)), num.of.train.samples[i])
-    fit <- randomForest(Survived ~ ., data = train[selected,], ntree=2000, importance=T)
-    trainRes <- predict(fit)
-    train.matrix[i, j] <- mean(trainRes != train[selected,]$Survived)
-    valRes <- predict(object=fit, newdata=validation)
-    val.matrix[i, j] <- mean(valRes != validation$Survived)
-  }
-}
 
-errors <- data.frame(sample.size=num.of.train.samples,
-                     train=rowMeans(train.matrix),
-                     val=rowMeans(val.matrix))
+# ================= build the learning curves =============
+num.of.train.samples <- seq(from=100, to=nrow(train.processed), by=20)
+
+require(doParallel)
+cl <- makeCluster(2)
+registerDoParallel(cl)
+source("scripts/cv.randomForest.R")
+
+require(randomForest)
+print(date())
+ptime <- system.time({
+  r <- foreach(i=c(1:length(num.of.train.samples)), .export=c("randomForest")) %dopar% {
+    res <- lapply(c(1:10), function(x, i){
+      selected <- sample(c(1:nrow(train.processed)), num.of.train.samples[i])
+      fit <- randomForest(Survived ~ ., data = train.processed[selected,], ntree=500, importance=T)
+      trainRes <- predict(fit)
+      train.error <- mean(trainRes != train.processed[selected,]$Survived)
+      cv.err <- cv.randomForest(train.processed[selected,], 5)
+      c(train.error, cv.err)
+    }, i)
+    temp <- matrix(unlist(res), ncol=2, byrow=T)
+    iErr <- apply(temp, 2, mean)
+  }
+})
+stopCluster(cl)
+print(date())
+
+r <- matrix(unlist(r), ncol=2, byrow=T)
+
+errors <- data.frame(sample.size=num.of.train.samples, train=r[,1], val=r[,2])
 
 require(ggplot2)
 p <- ggplot(data=errors) 

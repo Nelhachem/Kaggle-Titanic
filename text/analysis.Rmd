@@ -140,9 +140,54 @@ write.csv(submit, file = "../results/res.randomforest.v2.csv", row.names = FALSE
 ```
 Now this submission on April 13th, 2014 achieved 77.990% accuracy, ranking 741st/1258. Good job submitting the first result. We have a lot space for improvement. Keep going!
 
-Next Step
--------------------------
-Instead of adding more features like what the tutorial does, go back and try out what we have learned in the courses: 
-* Learning Curves
-* Start with simple algorithms like logistic regression
-* Based on the learning curve, think about ways for improvement like adding more variables, polynomial terms, or less variables.
+Analysis on April 19, 2014
+==============================================
+(Mentioning about Learning Curve in Andrew Ng's class here) According to the learning curve analysis on Logistic Regression (this will be inserted here), we are likely to be underfitting the data. Therefore, getting more data is not going to help much. However, we can add additional features or polynomial terms to help. 
+
+So what additional features can we add here? Remember that at the beginning, we removed several features including PassengerId, Cabin, Ticket and Name. As mentioned in the tutorial, the first three features are almost unique to each passenger. But what about the Name? Maybe we can extract something useful from those text strings. The tutorial mentioned the Titles of each passenger, which represents their social class and influences how they behaved. So let's extract the title as the tutorial does.
+
+```{r}
+test.processed$Survived <- NA
+combi <- rbind(train.processed, test.processed)
+combi$Name <- as.character(combi$Name)
+combi$Title <- sapply(combi$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][2]})
+combi$Title <- sub(' ', '', combi$Title)
+```
+OK, let's take a look at it.
+```{r}
+table(combi$Title)
+```
+It appears that there are some rare titles and we need to merge them together.
+```{r}
+combi$Title[combi$Title %in% c('Mme', 'Mlle')] <- 'Mlle'
+combi$Title[combi$Title %in% c('Capt', 'Don', 'Major', 'Sir')] <- 'Sir'
+combi$Title[combi$Title %in% c('Dona', 'Lady', 'the Countess', 'Jonkheer')] <- 'Lady'
+combi$Title <- factor(combi$Title)
+```
+The tutorial also added other features including FamilySize and FamilyID. We add them here as well.
+```{r}
+combi$FamilySize <- combi$SibSp + combi$Parch + 1
+combi$Surname <- sapply(combi$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][1]})
+combi$FamilyID <- paste(as.character(combi$FamilySize), combi$Surname, sep="")
+famIDs <- data.frame(table(combi$FamilyID))
+famIDs <- famIDs[famIDs$Freq <= 2,]
+combi$FamilyID[combi$FamilyID %in% famIDs$Var1] <- 'Small'
+combi$FamilyID <- factor(combi$FamilyID)
+
+combi$Survived <- as.factor(combi$Survived)
+train.processed <- combi[1:891,]
+test.processed <- combi[892:1309,]
+save(train.processed, file="../data/processed/train.processed.v3.RData")
+save(test.processed, file="../data/processed/test.processed.v3.RData")
+```
+Prediction
+------------------------
+```{r}
+fit <- glm(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize, family = binomial, data = train.processed)
+
+test.processed$Survived <- NULL
+Prediction <-ifelse(predict(fit, newdata=test.processed, type="response")>0.5, "1", "0")  
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v3.csv", row.names = FALSE)
+```
+And this achieves the same score 0.77990 as the randomForest we tried before. And it is better than last time when we tried Logistic Regression (around 0.75). This means adding the new features does help!
