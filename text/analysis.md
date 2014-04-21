@@ -238,13 +238,6 @@ require(randomForest)
 
 ```
 ## Loading required package: randomForest
-```
-
-```
-## Warning: package 'randomForest' was built under R version 3.0.3
-```
-
-```
 ## randomForest 4.6-7
 ## Type rfNews() to see new features/changes/bug fixes.
 ```
@@ -434,5 +427,38 @@ Prediction <- ifelse(predict(fit, newdata = test.processed, type = "response") >
 ```r
 submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
 write.csv(submit, file = "../results/res.randomforest.v3.csv", row.names = FALSE)
+```
+
+And this achieves the same score 0.77990 as the randomForest we tried before. And it is better than last time when we tried Logistic Regression (around 0.75). This means adding the new features does help!
+
+Analysis on April 21, 2014
+======================================
+Adding additional features
+--------------------------------------
+We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex.
+
+```r
+fit <- glm(Survived ~ Pclass + Sex * Age + SibSp + Parch + Fare + Embarked + 
+    Title + FamilySize, family = binomial, data = train.processed)
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+
+```r
+
+test.processed$Survived <- NULL
+Prediction <- ifelse(predict(fit, newdata = test.processed, type = "response") > 
+    0.5, "1", "0")
+```
+
+```
+## Warning: prediction from a rank-deficient fit may be misleading
+```
+
+```r
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v4.csv", row.names = FALSE)
 ```
 

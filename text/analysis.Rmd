@@ -191,3 +191,11 @@ submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Predic
 write.csv(submit, file = "../results/res.randomforest.v3.csv", row.names = FALSE)
 ```
 And this achieves the same score 0.77990 as the randomForest we tried before. And it is better than last time when we tried Logistic Regression (around 0.75). This means adding the new features does help!
+
+Analysis on April 21, 2014
+======================================
+Adding additional features
+--------------------------------------
+We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex (using Age*Sex in the model formula).
+
+We need to use cross validation to pick the best one as our representative.

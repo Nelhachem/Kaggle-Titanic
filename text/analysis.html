@@ -399,12 +399,7 @@ require(randomForest)
 </code></pre>
 
 <pre><code>## Loading required package: randomForest
-</code></pre>
-
-<pre><code>## Warning: package &#39;randomForest&#39; was built under R version 3.0.3
-</code></pre>
-
-<pre><code>## randomForest 4.6-7
+## randomForest 4.6-7
 ## Type rfNews() to see new features/changes/bug fixes.
 </code></pre>
 
@@ -572,6 +567,34 @@ Prediction &lt;- ifelse(predict(fit, newdata = test.processed, type = &quot;resp
 
 <pre><code class="r">submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
 write.csv(submit, file = &quot;../results/res.randomforest.v3.csv&quot;, row.names = FALSE)
+</code></pre>
+
+<p>And this achieves the same score 0.77990 as the randomForest we tried before. And it is better than last time when we tried Logistic Regression (around 0.75). This means adding the new features does help!</p>
+
+<h1>Analysis on April 21, 2014</h1>
+
+<h2>Adding additional features</h2>
+
+<p>We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex.</p>
+
+<pre><code class="r">fit &lt;- glm(Survived ~ Pclass + Sex * Age + SibSp + Parch + Fare + Embarked + 
+    Title + FamilySize, family = binomial, data = train.processed)
+</code></pre>
+
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+</code></pre>
+
+<pre><code class="r">
+test.processed$Survived &lt;- NULL
+Prediction &lt;- ifelse(predict(fit, newdata = test.processed, type = &quot;response&quot;) &gt; 
+    0.5, &quot;1&quot;, &quot;0&quot;)
+</code></pre>
+
+<pre><code>## Warning: prediction from a rank-deficient fit may be misleading
+</code></pre>
+
+<pre><code class="r">submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = &quot;../results/res.randomforest.v4.csv&quot;, row.names = FALSE)
 </code></pre>
 
 </body>
