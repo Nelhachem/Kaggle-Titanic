@@ -208,3 +208,13 @@ write.csv(submit, file = "../results/res.randomforest.v4.csv", row.names = FALSE
 # require(bestglm)
 ```
 This improved the result with 0.00478 and now we rank at 516/1227. Next step, check if we are overfitting or still underfitting. Either way, consider feature selection to filter out irrelevant or redundant features. 
+
+Well, my wife says dear just try SVM. So here we go, simple SVM without tuning.
+```{r}
+require(e1071)
+svmfit = svm(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize, data = train.processed, kernel = "linear", cost = 10, scale = FALSE)
+test.processed$Survived <- NULL
+Prediction <-predict(svmfit, newdata=test.processed)
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v5.csv", row.names = FALSE)
+```

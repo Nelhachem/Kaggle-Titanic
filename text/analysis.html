@@ -667,6 +667,26 @@ write.csv(submit, file = &quot;../results/res.randomforest.v4.csv&quot;, row.nam
 # require(bestglm)
 </code></pre>
 
+<p>This improved the result with 0.00478 and now we rank at 516/1227. Next step, check if we are overfitting or still underfitting. Either way, consider feature selection to filter out irrelevant or redundant features. </p>
+
+<pre><code class="r">require(e1071)
+</code></pre>
+
+<pre><code>## Loading required package: e1071
+</code></pre>
+
+<pre><code>## Warning: package &#39;e1071&#39; was built under R version 3.0.3
+</code></pre>
+
+<pre><code class="r">svmfit = svm(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + 
+    Title + FamilySize, data = train.processed, kernel = &quot;linear&quot;, cost = 10, 
+    scale = FALSE)
+test.processed$Survived &lt;- NULL
+Prediction &lt;- predict(svmfit, newdata = test.processed)
+submit &lt;- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = &quot;../results/res.randomforest.v5.csv&quot;, row.names = FALSE)
+</code></pre>
+
 </body>
 
 </html>
