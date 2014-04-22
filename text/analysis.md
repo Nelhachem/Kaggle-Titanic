@@ -238,13 +238,6 @@ require(randomForest)
 
 ```
 ## Loading required package: randomForest
-```
-
-```
-## Warning: package 'randomForest' was built under R version 3.0.3
-```
-
-```
 ## randomForest 4.6-7
 ## Type rfNews() to see new features/changes/bug fixes.
 ```
@@ -539,16 +532,14 @@ write.csv(submit, file = "../results/res.randomforest.v4.csv", row.names = FALSE
 
 This improved the result with 0.00478 and now we rank at 516/1227. Next step, check if we are overfitting or still underfitting. Either way, consider feature selection to filter out irrelevant or redundant features. 
 
+Well, my wife says dear just try SVM. So here we go, simple SVM without tuning.
+
 ```r
 require(e1071)
 ```
 
 ```
 ## Loading required package: e1071
-```
-
-```
-## Warning: package 'e1071' was built under R version 3.0.3
 ```
 
 ```r
@@ -559,5 +550,85 @@ test.processed$Survived <- NULL
 Prediction <- predict(svmfit, newdata = test.processed)
 submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
 write.csv(submit, file = "../results/res.randomforest.v5.csv", row.names = FALSE)
+```
+
+
+We would like to use the glmnet package and apply the regularized logistic regression on the data set. First, we will try LASSO model.
+
+```r
+require(glmnet)
+```
+
+```
+## Loading required package: glmnet
+## Loading required package: Matrix
+## Loaded glmnet 1.9-5
+```
+
+```r
+
+require(doParallel)
+```
+
+```
+## Loading required package: doParallel
+## Loading required package: foreach
+## Loading required package: iterators
+## Loading required package: parallel
+```
+
+```r
+cl <- makeCluster(2)
+registerDoParallel(cl)
+
+results <- lapply(c(1:5), function(i) {
+    xTotal = model.matrix(Survived ~ Pclass + Sex + Sex:Age + poly(Age, i) + 
+        poly(SibSp, i) + poly(Parch, i) + poly(Fare, i) + Embarked + Title + 
+        poly(FamilySize, i), data = combi)
+    train <- c(1:891)
+    x = xTotal[train, ]
+    y = train.processed$Survived
+    
+    list(model = cv.glmnet(x, y, family = "binomial", type.measure = "class", 
+        parallel = T), testData = xTotal[-train, ])
+})
+stopCluster(cl)
+lapply(results, function(x) {
+    min(x[["cvm"]])
+})
+```
+
+```
+## Warning: no non-missing arguments to min; returning Inf
+## Warning: no non-missing arguments to min; returning Inf
+## Warning: no non-missing arguments to min; returning Inf
+## Warning: no non-missing arguments to min; returning Inf
+## Warning: no non-missing arguments to min; returning Inf
+```
+
+```
+## [[1]]
+## [1] Inf
+## 
+## [[2]]
+## [1] Inf
+## 
+## [[3]]
+## [1] Inf
+## 
+## [[4]]
+## [1] Inf
+## 
+## [[5]]
+## [1] Inf
+```
+
+It seems that 2 or 4 degree polynomial has the lowest cross validation error. According to the simplicity rule, we choose the model with 2 degree polynomial.
+
+```r
+cv.fit <- results[[2]]$model
+testData <- results[[2]]$testData
+test.processed$Survived <- NULL
+Prediction <- predict(cv.fit, newx = testData)
 ```
 

@@ -218,3 +218,33 @@ Prediction <-predict(svmfit, newdata=test.processed)
 submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
 write.csv(submit, file = "../results/res.randomforest.v5.csv", row.names = FALSE)
 ```
+
+We would like to use the glmnet package and apply the regularized logistic regression on the data set. First, we will try LASSO model.
+```{r}
+require(glmnet)
+
+require(doParallel)
+cl <- makeCluster(2)
+registerDoParallel(cl)
+
+results <- lapply(c(1:5), function(i){
+  xTotal = model.matrix(Survived ~ Pclass + Sex + Sex:Age + poly(Age, i) + poly(SibSp,i) + poly(Parch,i) + poly(Fare,i) 
+                        + Embarked + Title + poly(FamilySize,i), data = combi)
+  train <- c(1:891)
+  x = xTotal[train,]
+  y = train.processed$Survived
+  
+  list(model=cv.glmnet(x, y, family="binomial", type.measure="class", parallel=T), testData=xTotal[-train,])
+})
+stopCluster(cl)
+lapply(results, function(x){
+  min(x[["cvm"]])
+})
+```
+It seems that 2 or 4 degree polynomial has the lowest cross validation error. According to the simplicity rule, we choose the model with 2 degree polynomial.
+```{r}
+cv.fit <- results[[2]]$model
+testData <- results[[2]]$testData
+test.processed$Survived <- NULL
+Prediction <-predict(cv.fit, newx=testData)
+```

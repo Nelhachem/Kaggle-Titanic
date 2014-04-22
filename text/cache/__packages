@@ -1,4 +1,10 @@
 base
+doParallel
+e1071
+foreach
+glmnet
+iterators
 knitr
+Matrix
 randomForest
 rpart
