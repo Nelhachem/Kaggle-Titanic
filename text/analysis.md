@@ -238,6 +238,13 @@ require(randomForest)
 
 ```
 ## Loading required package: randomForest
+```
+
+```
+## Warning: package 'randomForest' was built under R version 3.0.3
+```
+
+```
 ## randomForest 4.6-7
 ## Type rfNews() to see new features/changes/bug fixes.
 ```
@@ -435,19 +442,86 @@ Analysis on April 21, 2014
 ======================================
 Adding additional features
 --------------------------------------
-We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex.
+We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex (using Age*Sex in the model formula).
+
 
 ```r
-fit <- glm(Survived ~ Pclass + Sex * Age + SibSp + Parch + Fare + Embarked + 
-    Title + FamilySize, family = binomial, data = train.processed)
+fit <- glm(Survived ~ Pclass + Sex + Sex:Age + poly(Age, 2) + poly(SibSp, 2) + 
+    poly(Parch, 2) + poly(Fare, 2) + Embarked + Title * Sex + I(FamilySize^2), 
+    family = binomial, data = train.processed)
 ```
 
 ```
+## Warning: glm.fit: algorithm did not converge
 ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 ```
 
 ```r
+summary(fit)
+```
 
+```
+## 
+## Call:
+## glm(formula = Survived ~ Pclass + Sex + Sex:Age + poly(Age, 2) + 
+##     poly(SibSp, 2) + poly(Parch, 2) + poly(Fare, 2) + Embarked + 
+##     Title * Sex + I(FamilySize^2), family = binomial, data = train.processed)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -2.453  -0.559  -0.385   0.524   2.455  
+## 
+## Coefficients: (9 not defined because of singularities)
+##                      Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)          9.44e+12   7.03e+13    0.13    0.893    
+## Pclass              -1.13e+00   1.87e-01   -6.03  1.6e-09 ***
+## Sexmale             -9.44e+12   7.03e+13   -0.13    0.893    
+## poly(Age, 2)1       -1.14e+01   5.35e+00   -2.13    0.033 *  
+## poly(Age, 2)2       -1.18e-01   3.78e+00   -0.03    0.975    
+## poly(SibSp, 2)1     -5.41e+01   3.12e+01   -1.73    0.083 .  
+## poly(SibSp, 2)2     -2.73e+01   1.50e+01   -1.82    0.068 .  
+## poly(Parch, 2)1     -1.64e+01   1.37e+01   -1.20    0.232    
+## poly(Parch, 2)2     -5.28e+00   4.94e+00   -1.07    0.285    
+## poly(Fare, 2)1       3.40e+00   4.28e+00    0.80    0.426    
+## poly(Fare, 2)2       2.01e+00   4.04e+00    0.50    0.619    
+## EmbarkedQ            8.96e-02   4.07e-01    0.22    0.826    
+## EmbarkedS           -3.58e-01   2.51e-01   -1.43    0.153    
+## TitleDr             -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleLady           -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleMaster          2.70e+00   1.66e+00    1.63    0.104    
+## TitleMiss           -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleMlle           -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleMr             -9.13e-01   1.46e+00   -0.62    0.532    
+## TitleMrs            -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleMs             -9.44e+12   7.03e+13   -0.13    0.893    
+## TitleRev            -2.54e+01   1.24e+05    0.00    1.000    
+## TitleSir            -4.95e-01   1.71e+00   -0.29    0.772    
+## I(FamilySize^2)      6.11e-02   8.72e-02    0.70    0.484    
+## Sexfemale:Age        5.49e-03   2.02e-02    0.27    0.786    
+## Sexmale:Age                NA         NA      NA       NA    
+## Sexmale:TitleDr      9.44e+12   7.03e+13    0.13    0.893    
+## Sexmale:TitleLady    9.44e+12   7.03e+13    0.13    0.893    
+## Sexmale:TitleMaster        NA         NA      NA       NA    
+## Sexmale:TitleMiss          NA         NA      NA       NA    
+## Sexmale:TitleMlle          NA         NA      NA       NA    
+## Sexmale:TitleMr            NA         NA      NA       NA    
+## Sexmale:TitleMrs           NA         NA      NA       NA    
+## Sexmale:TitleMs            NA         NA      NA       NA    
+## Sexmale:TitleRev           NA         NA      NA       NA    
+## Sexmale:TitleSir           NA         NA      NA       NA    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  714.38  on 864  degrees of freedom
+## AIC: 768.4
+## 
+## Number of Fisher Scoring iterations: 25
+```
+
+```r
 test.processed$Survived <- NULL
 Prediction <- ifelse(predict(fit, newdata = test.processed, type = "response") > 
     0.5, "1", "0")
@@ -460,5 +534,6 @@ Prediction <- ifelse(predict(fit, newdata = test.processed, type = "response") >
 ```r
 submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
 write.csv(submit, file = "../results/res.randomforest.v4.csv", row.names = FALSE)
+# require(bestglm)
 ```
 

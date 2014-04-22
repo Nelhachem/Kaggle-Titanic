@@ -198,4 +198,13 @@ Adding additional features
 --------------------------------------
 We can consider adding polynomial terms in the model. But it only works with numerical variables. Start with degree 2 polynomials and move on to higher degree later. We can also consider the interaction between variables, for example, the one between Age and Sex (using Age*Sex in the model formula).
 
-We need to use cross validation to pick the best one as our representative.
+```{r}
+fit <- glm(Survived ~ Pclass + Sex+ Sex:Age + poly(Age,2) + poly(SibSp,2) + poly(Parch,2) + poly(Fare,2) + Embarked + Title*Sex + I(FamilySize^2), family = binomial, data = train.processed)
+summary(fit)
+test.processed$Survived <- NULL
+Prediction <-ifelse(predict(fit, newdata=test.processed, type="response")>0.5, "1", "0")  
+submit <- data.frame(PassengerId = test.processed$PassengerId, Survived = Prediction)
+write.csv(submit, file = "../results/res.randomforest.v4.csv", row.names = FALSE)
+# require(bestglm)
+```
+This improved the result with 0.00478 and now we rank at 516/1227. Next step, check if we are overfitting or still underfitting. Either way, consider feature selection to filter out irrelevant or redundant features. 
